@@ -1,0 +1,31 @@
+spring:
+  # 1. DB 설정 (오라클 XE 기준)
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521:xe
+    username: system  # 본인의 DB 계정
+    password: oracle  # 본인의 DB 비번
+
+  # 2. 메일 설정 (SMTP)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: whdrns456@gmail.com # 보안을 위해 나중에 환경변수로
+    password: xjmkwwyncwrropyj # 비밀번호 환경변수로 뺴기
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # 3. JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  # 4. DevTools 설정
+  devtools:
+    livereload:
+      enabled: true
