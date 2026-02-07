@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:fragment="mainHeader" id="main-header" name="top-navigation">
+    <div class="header-left" id="logo-area">
+        <div class="logo" id="main-logo" onclick="location.href='/'">은영노인요양시설</div>
+    </div>
+
+    <nav class="header-center">
+        <ul class="nav-main nav-links">
+            <li><a th:href="@{/about}">요양원 소개</a></li>
+            <li><a th:href="@{/schedule}">일정 안내</a></li>
+            <li><a th:href="@{/notice}">공지사항</a></li>
+            <li><a th:href="@{/fees}">수가 계산</a></li>
+            <li><a th:href="@{/outing}">외출신청</a></li>
+            <li><a th:href="@{/visit}">면회신청</a></li>
+        </ul>
+    </nav>
+
+    <ul class="header-right nav-links">
+        <li><a th:href="@{/login}" class="auth-link">로그인</a></li>
+        <li><a th:href="@{/signup}" class="auth-link">회원가입</a></li>
+    </ul>
+</header>
+</html>

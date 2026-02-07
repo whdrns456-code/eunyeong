@@ -1,17 +1,19 @@
+server:
+  port: 8080
 spring:
   # 1. DB 설정 (오라클 XE 기준)
-  datasource:
-    driver-class-name: oracle.jdbc.OracleDriver
-    url: jdbc:oracle:thin:@localhost:1521:xe
-    username: system  # 본인의 DB 계정
-    password: oracle  # 본인의 DB 비번
+#  datasource:
+ #   driver-class-name: oracle.jdbc.OracleDriver
+  #  url: jdbc:oracle:thin:@localhost:1521:xe
+   # username: system  #  DB 계정  환경 변수로 뺴기
+  #password: oracle  # DB 비번 환경 변수로 빼기
 
   # 2. 메일 설정 (SMTP)
   mail:
     host: smtp.gmail.com
     port: 587
-    username: whdrns456@gmail.com # 보안을 위해 나중에 환경변수로
-    password: xjmkwwyncwrropyj # 비밀번호 환경변수로 뺴기
+    username: ${MAIL_ID} # 보안을 위해 나중에 환경변수로
+    password: ${MAIL_PASSWORD} # 비밀번호 환경변수로 뺴기
     properties:
       mail:
         smtp:

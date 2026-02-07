@@ -11,7 +11,7 @@ public class EmailController {
 
     private final EmailService emailService;
 
-    @PostMapping("/send")
+    @GetMapping("/mailTest")
     public String mailSend(@RequestParam("email") String email) throws Exception {
         return emailService.sendEmail(email);
     }

@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">은영노인요양시설 & 주간보호센터</title>
+    <!-- Tailwind CSS & Font Awesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- 기존 CSS 파일 연결 -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+    <style>
+        /* 추가 애니메이션 및 슬라이더 스타일 */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slowZoom {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
+        }
+        .animate-fade-up { opacity: 0; animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .animate-slow-zoom { animation: slowZoom 12s linear infinite alternate; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-600 { animation-delay: 0.6s; }
+
+        .slide { opacity: 0; transition: opacity 1.2s ease-in-out; position: absolute; inset: 0; }
+        .slide.active { opacity: 1; z-index: 10; }
+
+        #google-map-container {
+            filter: grayscale(0.2);
+            transition: filter 0.3s ease;
+        }
+        #google-map-container:hover { filter: grayscale(0); }
+
+        /* 기존 main.css의 flex 레이아웃이 섹션 흐름을 방해하지 않도록 조정 */
+        main { display: block !important; padding: 0 !important; margin-top: 80px; }
+    </style>
+    <script type="importmap">
+        {
+          "imports": {
+            "react": "https://esm.sh/react@^19.2.4",
+            "react/": "https://esm.sh/react@^19.2.4/"
+          }
+        }
+    </script>
+    <link rel="stylesheet" href="/index.css">
+</head>
+<body id="care-system-body" class="bg-gray-50 text-gray-800">
+<!-- 헤더 (기존 설정 유지) -->
+<header th:replace="~{header/header :: mainHeader}"></header>
+
+<main>
+    <!-- [SECTION 1] 히어로 애니메이션 슬라이더 -->
+    <section id="hero-slider" class="relative h-[60vh] md:h-[75vh] lg:h-[80vh] w-full bg-gray-900 overflow-hidden">
+        <!-- 슬라이드 1 -->
+        <div class="slide active" data-index="0">
+            <div class="absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1581578731522-aa7c0490b830?auto=format&fit=crop&q=80&w=1920" class="w-full h-full object-cover animate-slow-zoom" alt="가족같은 보금자리">
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+            </div>
+            <div class="relative z-20 h-full flex items-center justify-center px-4">
+                <div class="max-w-4xl text-center">
+                    <span class="inline-block px-4 py-1.5 bg-orange-500 text-white rounded-full text-xs md:text-sm font-bold mb-6 animate-fade-up">따뜻한 마음</span>
+                    <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 animate-fade-up delay-200">
+                        가족처럼 편안한 <span class="text-orange-300">보금자리</span>,<br>은영이 정성으로 모십니다
+                    </h1>
+                    <p class="text-gray-200 text-sm md:text-xl animate-fade-up delay-400 max-w-2xl mx-auto">
+                        어르신들의 평온한 노후를 위해 내 집 같은 편안함을 약속드립니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 슬라이드 2 -->
+        <div class="slide" data-index="1">
+            <div class="absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=1920" class="w-full h-full object-cover animate-slow-zoom" alt="맞춤형 케어">
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+            </div>
+            <div class="relative z-20 h-full flex items-center justify-center px-4">
+                <div class="max-w-4xl text-center">
+                    <span class="inline-block px-4 py-1.5 bg-emerald-500 text-white rounded-full text-xs md:text-sm font-bold mb-6">전문 의료 지원</span>
+                    <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+                        어르신 한 분 한 분을 위한<br><span class="text-emerald-300">세심한</span> 맞춤형 케어
+                    </h1>
+                    <p class="text-gray-200 text-sm md:text-xl max-w-2xl mx-auto">
+                        전문 인력이 24시간 상주하며 체계적인 건강 관리를 제공합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 슬라이드 3 -->
+        <div class="slide" data-index="2">
+            <div class="absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1516733958028-966f0517565d?auto=format&fit=crop&q=80&w=1920" class="w-full h-full object-cover animate-slow-zoom" alt="주간보호">
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+            </div>
+            <div class="relative z-20 h-full flex items-center justify-center px-4">
+                <div class="max-w-4xl text-center">
+                    <span class="inline-block px-4 py-1.5 bg-blue-500 text-white rounded-full text-xs md:text-sm font-bold mb-6">즐거운 일상</span>
+                    <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+                        활기찬 하루를 선물하는<br><span class="text-blue-300">은영 주간보호센터</span>
+                    </h1>
+                    <p class="text-gray-200 text-sm md:text-xl max-w-2xl mx-auto">
+                        인지 자극 프로그램과 사회 활동으로 어르신의 행복한 일상을 지원합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 인디케이터 -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex space-x-3" id="indicators">
+            <button class="w-10 h-2 bg-orange-500 rounded-full transition-all" data-target="0"></button>
+            <button class="w-2 h-2 bg-white/50 rounded-full transition-all" data-target="1"></button>
+            <button class="w-2 h-2 bg-white/50 rounded-full transition-all" data-target="2"></button>
+        </div>
+    </section>
+
+    <!-- [SECTION 2] 서비스 소개 -->
+    <section class="py-20 px-4 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- 요양원 -->
+            <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:-translate-y-2 transition-transform duration-300">
+                <div class="h-44 bg-emerald-600 p-8 text-white relative">
+                    <i class="fa-solid fa-user-nurse text-7xl absolute right-6 bottom-4 opacity-20"></i>
+                    <h3 class="text-2xl font-bold mb-2">은영 노인요양시설</h3>
+                    <p class="opacity-80">24시간 요양 및 의료 서비스</p>
+                </div>
+                <div class="p-8">
+                    <ul class="space-y-3 mb-8 text-gray-600">
+                        <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 전문 간호 및 맞춤형 요양</li>
+                        <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 영양 식단 및 물리치료 지원</li>
+                        <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 쾌적한 전용 생활 공간</li>
+                    </ul>
+                    <button class="w-full py-3 bg-gray-50 text-emerald-700 font-bold rounded-xl hover:bg-emerald-50">시설 자세히 보기</button>
+                </div>
+            </div>
+            <!-- 주간보호 -->
+            <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden group hover:-translate-y-2 transition-transform duration-300">
+                <div class="h-44 bg-orange-500 p-8 text-white relative">
+                    <i class="fa-solid fa-sun text-7xl absolute right-6 bottom-4 opacity-20"></i>
+                    <h3 class="text-2xl font-bold mb-2">은영 주간보호센터</h3>
+                    <p class="opacity-80">낮 시간 동안 안전하고 즐겁게</p>
+                </div>
+                <div class="p-8">
+                    <ul class="space-y-3 mb-8 text-gray-600">
+                        <li><i class="fa-solid fa-check text-orange-500 mr-2"></i> 안전한 송영 서비스 (등/하원)</li>
+                        <li><i class="fa-solid fa-check text-orange-500 mr-2"></i> 인지 및 사회활동 프로그램</li>
+                        <li><i class="fa-solid fa-check text-orange-500 mr-2"></i> 건강한 중식 및 간식 제공</li>
+                    </ul>
+                    <button class="w-full py-3 bg-gray-50 text-orange-700 font-bold rounded-xl hover:bg-orange-50">센터 프로그램 보기</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- [SECTION 3] 직원 소개 -->
+    <section class="bg-orange-50/30 py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">감사를 전하는 따뜻한 한마디</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-orange-100">
+                    <p class="text-gray-600 italic mb-6">"최선을 다해서 모시겠습니다."</p>
+                    <div class="font-bold text-gray-800">- 최영수 원장님</div>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-orange-100">
+                    <p class="text-gray-600 italic mb-6">"최선을 다해서 모시겠습니다"</p>
+                    <div class="font-bold text-gray-800">- 신은경 부원장님</div>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-orange-100">
+                    <p class="text-gray-600 italic mb-6">"최선을 다해서 모시겠습니다"</p>
+                    <div class="font-bold text-gray-800">- 사무국장님</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- [SECTION 4] 위치 및 지도 -->
+    <section class="py-20 px-4 max-w-7xl mx-auto" id="location">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div>
+                <h2 class="text-3xl font-bold mb-8 text-gray-800 flex items-center">
+                    <i class="fa-solid fa-location-dot text-orange-500 mr-3"></i>
+                    오시는 길
+                </h2>
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 mr-4 flex-shrink-0">
+                            <i class="fa-solid fa-map-pin"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">주소</h4>
+                            <p class="text-gray-600">강원도 강릉시 경포로 100번길 20-1</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 mr-4 flex-shrink-0">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">문의 전화</h4>
+                            <p class="text-gray-600 text-lg font-bold">033-643-7573</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mr-4 flex-shrink-0">
+                            <i class="fa-solid fa-bus"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">교통 안내</h4>
+                            <p class="text-gray-600">지하철 2호선 행복역 3번 출구 도보 5분</p>
+                            <p class="text-gray-500 text-sm italic">버스 100, 202번 '은영노인요양원' 하차</p>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            <!-- Google Map Placeholder -->
+            <div class="h-[400px] rounded-3xl overflow-hidden shadow-inner bg-gray-200 relative border-4 border-white" id="google-map-container">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-white/40 backdrop-blur-sm z-10">
+                    <i class="fa-solid fa-map-location-dot text-6xl text-gray-400 mb-4"></i>
+                    <h3 class="font-bold text-gray-700">Google Maps API 로드 위치</h3>
+                    <p class="text-sm text-gray-500 mt-2">아직 미지원</p>
+                </div>
+                <img src="https://picsum.photos/id/164/800/600?grayscale" class="w-full h-full object-cover opacity-30" alt="Map Area">
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- 푸터 -->
+<footer class="bg-gray-800 text-white py-12 px-4 border-t border-gray-700">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+            <h4 class="text-orange-400 font-bold text-xl mb-4">은영노인요양시설</h4>
+            <p class="text-sm text-gray-400 leading-relaxed">어르신의 존엄한 노후를 존중하며,<br>가족의 마음으로 정성을 다해 모시겠습니다.</p>
+        </div>
+        <div>
+            <h4 class="text-orange-400 font-bold text-xl mb-4">상담 및 안내</h4>
+            <p class="text-2xl font-bold mb-2">02-1234-5678</p>
+            <p class="text-sm text-gray-400">주중/주말 상담 가능</p>
+        </div>
+        <div class="flex flex-col space-y-2 text-sm text-gray-400">
+            <h4 class="text-orange-400 font-bold text-xl mb-4">바로가기</h4>
+            <a href="#" class="hover:text-white transition-colors">시설안내</a>
+            <a href="#" class="hover:text-white transition-colors">프로그램 소개</a>
+            <a href="#" class="hover:text-white transition-colors">상담예약</a>
+        </div>
+    </div>
+    <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-700 text-center text-xs text-gray-500">
+        &copy; 2026 은영노인요양시설 & 주간보호센터. All Rights Reserved.
+    </div>
+</footer>
+
+<!-- 슬라이더 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const slides = document.querySelectorAll('.slide');
+        const indicators = document.querySelectorAll('#indicators button');
+        let currentIdx = 0;
+        const slideInterval = 6000;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                    // 텍스트 애니메이션 초기화 후 재생
+                    const animatedElements = slide.querySelectorAll('.animate-fade-up');
+                    animatedElements.forEach(el => {
+                        el.style.animation = 'none';
+                        void el.offsetWidth;
+                        el.style.animation = null;
+                    });
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            indicators.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.replace('w-2', 'w-10');
+                    dot.classList.replace('bg-white/50', 'bg-orange-500');
+                } else {
+                    dot.classList.replace('w-10', 'w-2');
+                    dot.classList.replace('bg-orange-500', 'bg-white/50');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentIdx = (currentIdx + 1) % slides.length;
+            showSlide(currentIdx);
+        }
+
+        let timer = setInterval(nextSlide, slideInterval);
+
+        indicators.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                clearInterval(timer);
+                currentIdx = i;
+                showSlide(i);
+                timer = setInterval(nextSlide, slideInterval);
+            });
+        });
+    });
+</script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

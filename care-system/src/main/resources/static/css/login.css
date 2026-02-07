@@ -1,0 +1,151 @@
+/* static/css/login.css */
+
+/* 전체 로그인 페이지 컨테이너 */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 80px); /* 헤더 높이만큼 제외 */
+    padding: 40px var(--side-padding); /* 공통 패딩 변수 활용 */
+    background-color: var(--bg-color);
+    margin-top: 80px; /* 헤더 아래로 내용 내리기 */
+}
+
+/* 로그인 폼 카드 */
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08); /* 그림자 강화 */
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.login-card:hover {
+    transform: translateY(-5px); /* 호버 효과 */
+}
+
+.login-card h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* 입력 필드 그룹 */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--text-dark);
+    transition: border-color 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* 포커스 시 그림자 */
+}
+
+/* 로그인 버튼 */
+.login-btn {
+    width: 100%;
+    padding: 16px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 15px;
+}
+
+.login-btn:hover {
+    background-color: #3a7bd5; /* 조금 더 진한 색상 */
+    transform: translateY(-2px);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+/* 기타 링크 (회원가입, 비밀번호 찾기) */
+.extra-links {
+    margin-top: 25px;
+    font-size: 0.9rem;
+}
+
+.extra-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.extra-links a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* 시설 이미지 및 메시지 */
+.facility-info {
+    margin-top: 30px;
+    background-color: #eaf5ff; /* 배경색으로 따뜻함 강조 */
+    padding: 25px;
+    border-radius: 15px;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    line-height: 1.5;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+}
+
+.facility-info p {
+    color: var(--text-dark); /* p 태그 기본색상 오버라이드 */
+    margin-bottom: 10px;
+}
+
+.facility-info strong {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* 반응형 */
+@media (max-width: 600px) {
+    .login-card {
+        padding: 30px;
+        border-radius: 15px;
+    }
+    .login-card h2 {
+        font-size: 1.6rem;
+    }
+    .input-group input, .login-btn {
+        padding: 12px 15px;
+        font-size: 1rem;
+    }
+    .facility-info {
+        padding: 20px;
+        font-size: 0.9rem;
+    }
+}
