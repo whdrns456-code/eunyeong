@@ -1,11 +1,390 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SilverCare | 어르신 면회 예약 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" th:href="@{/css/header.css}">
-<body>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+
+        @media (min-width: 768px) {
+            body {
+                padding-top: 100px;
+            }
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f1f5f9; /* Off-white 배경 */
+            padding-top: 80px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .calendar-cell {
+            min-height: 110px;
+            transition: all 0.2s ease;
+            background-color: #ffffff; /* 달력 셀 기본 색상 (흰색) */
+            border: 0.5px solid #e2e8f0;
+        }
+        @media (min-width: 768px) {
+            .calendar-cell {
+                min-height: 150px;
+            }
+        }
+        .calendar-cell:hover {
+            background-color: #f8fafc;
+        }
+        .calendar-cell.other-month {
+            background-color: #f1f5f9; /* 이전/다음달 배경색 */
+            color: #94a3b8;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .modal-backdrop {
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
 <header th:replace="~{header/header :: mainHeader}"></header>
+
+<body class="antialiased text-slate-900">
+<div id="app" class="min-h-screen p-3 md:p-8">
+    <div class="max-w-6xl mx-auto">
+
+
+
+        <!-- 달력 컨트롤러 -->
+        <div class="flex items-center justify-between mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex items-center gap-5">
+                <h2 id="current-month-display" class="text-xl md:text-2xl font-bold text-slate-800">2024년 5월</h2>
+                <button onclick="handleToday()" class="px-4 py-1.5 text-sm font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-full transition-all active:scale-95">
+                    오늘
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="changeMonth(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all">
+                    <i class="fa-solid fa-chevron-left text-slate-600"></i>
+                </button>
+                <button onclick="changeMonth(1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all">
+                    <i class="fa-solid fa-chevron-right text-slate-600"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 달력 본체 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="calendar-grid bg-slate-50/50 border-b border-slate-200">
+                <div class="py-3 text-center text-xs font-bold text-rose-500 uppercase tracking-widest">SUN</div>
+                <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">MON</div>
+                <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">TUE</div>
+                <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">WED</div>
+                <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">THU</div>
+                <div class="py-3 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">FRI</div>
+                <div class="py-3 text-center text-xs font-bold text-blue-500 uppercase tracking-widest">SAT</div>
+            </div>
+            <div id="calendar-body" class="calendar-grid">
+                <!-- 날짜 셀들이 JS로 생성됨 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 예약 등록 모달 -->
+<div id="reservation-modal" class="fixed inset-0 z-50 hidden modal-backdrop items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-100">
+        <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
+            <div>
+                <h2 id="modal-title" class="text-lg font-bold">면회 예약 신청</h2>
+                <p id="modal-subtitle" class="text-xs text-slate-400"></p>
+            </div>
+            <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center hover:bg-slate-800 rounded-full transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <form id="reservation-form" class="p-6 space-y-5">
+            <input type="hidden" id="selected-date">
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 uppercase ml-1">면회 층수</label>
+                        <input type="text" id="floor" value="1층" readonly
+                               class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-600 outline-none cursor-default"
+                               title="면회는 1층에서만 가능합니다.">
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase ml-1">면회 시간</label>
+                    <select id="time" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none font-medium" required>
+                        <option value="10:00">10:00</option>
+                        <option value="10:30">10:30</option>
+                        <option value="11:00">11:00</option>
+                        <option value="11:30">11:30</option>
+                        <option value="12:00">12:00</option>
+                        <option value="13:30">13:30</option>
+                        <option value="14:00">14:00</option>
+                        <option value="14:30">14:30</option>
+                        <option value="15:00">15:00</option>
+                        <option value="15:30">15:30</option>
+                        <option value="16:00">16:00</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">어르신 성함</label>
+                <input type="text" id="resident-name" placeholder="성함 입력" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none font-medium" required>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">방문객 성함</label>
+                <input type="text" id="visitor-name" placeholder="예약자 성함 입력" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none font-medium" required>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">연락처</label>
+                <input type="tel" id="phone-number" placeholder="010-0000-0000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none font-medium" required>
+            </div>
+
+            <div class="pt-4 flex gap-3">
+                <button type="button" onclick="closeModal()" class="flex-1 py-3.5 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-colors">취소</button>
+                <button type="submit" class="flex-[2] py-3.5 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95">예약 확정</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // --- 설정 및 상태 ---
+    const CONFIG = {
+        minDate: new Date(new Date().setHours(0, 0, 0, 0)), // 오늘 00:00:00
+        maxDate: new Date(new Date().setDate(new Date().getDate() + 30)) // 오늘부터 30일 후
+    };
+
+    const state = {
+        currentDate: new Date(),
+        reservations: JSON.parse(localStorage.getItem('silvercare_v3_reservations')) || [
+            { id: 'ex1', date: formatDate(new Date()), time: '10:30', floor: '2층', residentName: '김어르신', visitorName: '김방문' }
+        ]
+    };
+
+    // --- 유틸리티 ---
+    function formatDate(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function saveToStorage() {
+        localStorage.setItem('silvercare_v3_reservations', JSON.stringify(state.reservations));
+    }
+
+    // --- 달력 이동 제어 (범위 제한) ---
+    window.changeMonth = (val) => {
+        const nextMonth = new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() + val, 1);
+
+        // 오늘이 속한 달과 30일 후가 속한 달의 범위를 계산
+        const minMonth = new Date(CONFIG.minDate.getFullYear(), CONFIG.minDate.getMonth(), 1);
+        const maxMonth = new Date(CONFIG.maxDate.getFullYear(), CONFIG.maxDate.getMonth(), 1);
+
+        if (nextMonth < minMonth || nextMonth > maxMonth) {
+            alert("예약 범위를 초과하였습니다.");
+            return;
+        }
+
+        state.currentDate = nextMonth;
+        renderCalendar();
+    };
+
+    window.handleToday = () => {
+        state.currentDate = new Date();
+        renderCalendar();
+    };
+
+    // --- 달력 렌더링 엔진 ---
+    function renderCalendar() {
+        const year = state.currentDate.getFullYear();
+        const month = state.currentDate.getMonth();
+
+        document.getElementById('current-month-display').innerText = `${year}년 ${month + 1}월`;
+
+        const body = document.getElementById('calendar-body');
+        if (!body) return;
+        body.innerHTML = '';
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startPadding = firstDay.getDay();
+
+        // 1. 이전 달 빈 칸
+        for (let i = startPadding; i > 0; i--) {
+            const date = new Date(year, month, 1 - i);
+            body.appendChild(createCell(date, false));
+        }
+
+        // 2. 이번 달 날짜
+        for (let i = 1; i <= lastDay.getDate(); i++) {
+            const date = new Date(year, month, i);
+            body.appendChild(createCell(date, true));
+        }
+
+        // 3. 다음 달 빈 칸 (6x7 그리드 유지)
+        const totalSlots = 42;
+        const currentSlots = startPadding + lastDay.getDate();
+        const endPadding = totalSlots - currentSlots;
+        for (let i = 1; i <= endPadding; i++) {
+            const date = new Date(year, month + 1, i);
+            body.appendChild(createCell(date, false));
+        }
+    }
+
+    function createCell(date, isCurrentMonth) {
+        const dateStr = formatDate(date);
+        const cellDate = new Date(date).setHours(0, 0, 0, 0);
+
+        // 예약 가능 여부 판별 (오늘 이전이거나 30일 이후인 경우 차단)
+        const isPast = cellDate < CONFIG.minDate.getTime();
+        const isTooFar = cellDate > CONFIG.maxDate.getTime();
+        const isDisabled = isPast || isTooFar;
+
+        const dayReservations = state.reservations
+            .filter(r => r.date === dateStr)
+            .sort((a, b) => a.time.localeCompare(b.time));
+
+        const isToday = dateStr === formatDate(new Date());
+
+        const cell = document.createElement('div');
+        // 비활성화된 날짜에 대한 스타일 분기
+        cell.className = `calendar-cell p-2 flex flex-col ${!isCurrentMonth ? 'other-month' : ''}
+                         ${isDisabled ? 'opacity-40 cursor-not-allowed grayscale' : 'cursor-pointer hover:bg-slate-50'}`;
+
+        if (!isDisabled) {
+            cell.onclick = () => openModal(dateStr);
+        }
+
+        const header = document.createElement('div');
+        header.className = 'flex justify-between items-center mb-1';
+        const dayNum = document.createElement('span');
+        dayNum.className = `text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full ${isToday ? 'bg-indigo-600 text-white' : ''}`;
+        dayNum.innerText = date.getDate();
+
+        header.appendChild(dayNum);
+        cell.appendChild(header);
+
+        const listContainer = document.createElement('div');
+        listContainer.className = 'flex-1 space-y-1 overflow-y-auto custom-scrollbar max-h-[80px]';
+
+        dayReservations.forEach(res => {
+            const item = document.createElement('div');
+            item.className = `px-2 py-1 rounded text-[10px] font-bold border-l-2 flex justify-between items-center group/item ${getResStyle(res.floor)}`;
+            item.innerHTML = `
+                <span class="truncate">${res.time} ${res.residentName}</span>
+                <button onclick="deleteRes('${res.id}', event)" class="hidden group-hover/item:block text-slate-400 hover:text-rose-500">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            listContainer.appendChild(item);
+        });
+
+        cell.appendChild(listContainer);
+        return cell;
+    }
+
+    function getResStyle(floor) {
+        if (floor.includes('2층')) return 'bg-blue-50 text-blue-700 border-blue-400';
+        if (floor.includes('3층')) return 'bg-emerald-50 text-emerald-700 border-emerald-400';
+        return 'bg-amber-50 text-amber-700 border-amber-400';
+    }
+
+    // --- 상호작용 기능 (모달 오픈 시 2차 검증 포함) ---
+    window.openModal = (dateStr) => {
+        const selectedDate = new Date(dateStr).setHours(0, 0, 0, 0);
+        if (selectedDate < CONFIG.minDate.getTime() || selectedDate > CONFIG.maxDate.getTime()) {
+            alert("오늘부터 30일 이내의 날짜만 예약이 가능합니다.");
+            return;
+        }
+
+        document.getElementById('selected-date').value = dateStr;
+        document.getElementById('modal-subtitle').innerText = dateStr + ' 면회 예약';
+        document.getElementById('reservation-modal').classList.remove('hidden');
+        document.getElementById('reservation-modal').classList.add('flex');
+    };
+
+    window.closeModal = () => {
+        document.getElementById('reservation-modal').classList.add('hidden');
+        document.getElementById('reservation-modal').classList.remove('flex');
+        document.getElementById('reservation-form').reset();
+    };
+
+    window.deleteRes = (id, event) => {
+        event.stopPropagation();
+        if (confirm('예약을 취소하시겠습니까?')) {
+            state.reservations = state.reservations.filter(r => r.id !== id);
+            saveToStorage();
+            renderCalendar();
+        }
+    };
+
+    // --- 폼 서브밋 (시간 유효성 검사 추가) ---
+    document.getElementById('reservation-form').onsubmit = (e) => {
+        e.preventDefault();
+
+        const selectedTime = document.getElementById('time').value; // 예: "13:00"
+        const [hours, minutes] = selectedTime.split(':').map(Number);
+        const timeInMinutes = hours * 60 + minutes; // 시간을 분 단위로 환산
+
+        // 1. 운영 시간 검사 (10:00 ~ 16:00)
+        // 10:00 = 600분, 16:00 = 960분
+        if (timeInMinutes < 600 || timeInMinutes > 960) {
+            alert("면회 가능 시간은 오전 10시부터 오후 4시(16:00)까지입니다.");
+            return;
+        }
+
+        // 2. 점심 및 휴식 시간 검사 (12:30 ~ 13:30)
+        // 12:30 = 750분, 13:30 = 810분
+        if (timeInMinutes >= 750 && timeInMinutes <= 810) {
+            alert("오후 12시 30분부터 1시 30분까지는 면회 준비 및 점심시간으로 예약이 불가합니다.");
+            return;
+        }
+
+        // 3.  30분 단위 검사 추가
+        if (minutes !== 0 && minutes !== 30) {
+            alert("면회 예약은 30분 단위로만 가능합니다.\n(예: 14:00 또는 14:30)");
+            return;
+        }        // 모든 조건 통과 시 예약 저장
+        const newReservation = {
+            id: 'res-' + Date.now(),
+            date: document.getElementById('selected-date').value,
+            time: selectedTime,
+            floor: document.getElementById('floor').value,
+            residentName: document.getElementById('resident-name').value,
+            visitorName: document.getElementById('visitor-name').value,
+            phoneNumber: document.getElementById('phone-number').value
+        };
+
+        state.reservations.push(newReservation);
+        saveToStorage();
+        closeModal();
+        renderCalendar();
+
+        alert("예약이 성공적으로 완료되었습니다.");
+    };
+
+    renderCalendar();
+</script>
 
 </body>
 </html>

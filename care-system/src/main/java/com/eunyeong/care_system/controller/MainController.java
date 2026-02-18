@@ -1,61 +1,64 @@
 package com.eunyeong.care_system.controller;
+
+import com.eunyeong.care_system.model.SeniorDTO;
+import com.eunyeong.care_system.service.SeniorService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@RequiredArgsConstructor // 서비스를 주입받기 위해 꼭 필요함!
 public class MainController {
 
-    // 1. 메인 페이지
-    @GetMapping("/")
-    public String index() {
-        return "index";
+    private final SeniorService seniorService;
+
+
+    @Value("${api.kakao.key}") // yml에서 가져온 환경변수 값
+    private String mapApiKey;
+
+    @GetMapping("/") // 메인 접속 시
+    public String index(Model model) {
+        // index.html로 지도 키 전달
+        model.addAttribute("kakaoKey", mapApiKey);
+        return "index"; // index.html 반환
     }
 
-    // 2. 요양원 소개
     @GetMapping("/about")
-    public String about() {
-        return "about";
-    }
+    public String about() { return "about"; }
 
-    // 3. 일정 안내
     @GetMapping("/schedule")
-    public String schedule() {
-        return "schedule";
-    }
+    public String schedule() { return "schedule"; }
 
-    // 4. 공지사항
     @GetMapping("/notice")
-    public String notice() {
-        return "notice";
-    }
+    public String notice() { return "notice"; }
 
-    //5 . 수가 계산
     @GetMapping("/fees")
-    public String fees() {
-        return "fees";
-    }
+    public String fees() { return "fees"; }
 
-    // 6. 외출신청
     @GetMapping("/outing")
-    public String outing() {
-        return "outing";
-    }
+    public String outing() { return "outing"; }
 
-    // 6. 면회신청
     @GetMapping("/visit")
-    public String visit() {
-        return "visit";
-    }
+    public String visit() { return "visit"; }
 
-    // 8. 로그인
     @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
+    public String login() { return "login"; }
 
-    // 9. 회원가입
     @GetMapping("/signup")
-    public String signup() {
-        return "signup";
+    public String signup() { return "signup"; }
+
+    // 10. 마이페이지 (새로 추가)
+    @GetMapping("/mypage")
+    public String myPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails != null) {
+            // 현재 로그인한 사용자의 ID(userNo가 ID로 쓰인다면 그 값)로 데이터 조회
+            SeniorDTO myData = seniorService.getMyPageData(userDetails.getUsername());
+            model.addAttribute("seniorInfo", myData);
+        }
+        return "mypage";
     }
 }

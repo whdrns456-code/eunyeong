@@ -89,8 +89,49 @@ body {
     line-height: 1.6;
 }
 
-/* 반응형 설정 (헤더 관련) */
 @media (max-width: 900px) {
-    header { height: auto; flex-direction: column; padding: 20px; }
-    /* ... 헤더 관련 반응형 코드 ... */
+    header {
+        height: auto;
+        flex-direction: column; /* 세로 정렬 */
+        padding: 15px 10px;
+        gap: 15px; /* 로고와 네비게이션 사이 간격 */
+    }
+
+    /* 1. 로고 영역 중앙 정렬 */
+    .header-logo {
+        margin-right: 0;
+        text-align: center;
+    }
+
+    /* 2. 메뉴(GNB)를 모바일에서 한 줄씩 혹은 가로로 꽉 차게 */
+    nav ul {
+        display: flex;
+        flex-direction: row; /* 가로로 나열하되 */
+        flex-wrap: wrap;    /* 자리가 부족하면 다음 줄로 */
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    nav ul li a {
+        padding: 8px 12px;
+        font-size: 14px; /* 폰트 살짝 축소 */
+        display: block;
+    }
+
+    /* 3. 로그인/회원가입 버튼 그룹 */
+    .auth-buttons {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 5px;
+    }
+
+    .auth-buttons a {
+        flex: 1; /* 버튼 너비를 동일하게 배분 */
+        max-width: 120px;
+        text-align: center;
+        padding: 10px 0;
+    }
 }

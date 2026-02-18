@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareBridge MyPage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; padding-top: 80px; background-color: #f8fafc; }
+        .active-menu { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
+        .section-hidden { display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+
+<body class="flex flex-col md:flex-row min-h-screen">
+<header th:replace="~{header/header :: mainHeader}"></header>
+
+<div class="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center sticky top-0 z-50">
+    <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white">
+            <i class="fa-solid fa-heart-pulse text-sm"></i>
+        </div>
+        <span class="font-bold text-lg text-slate-800 tracking-tight">CareBridge</span>
+    </div>
+    <button id="mobile-menu-btn" class="text-slate-600 focus:outline-none">
+        <i class="fa-solid fa-bars text-xl"></i>
+    </button>
+</div>
+
+<nav id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-40 w-64 bg-white border-r border-slate-200 flex flex-col shadow-lg md:shadow-none">
+    <div class="p-6 border-b border-slate-100 hidden md:flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+            <i class="fa-solid fa-heart-pulse text-lg"></i>
+        </div>
+        <span class="font-bold text-xl text-slate-800 tracking-tight">CareBridge</span>
+    </div>
+
+    <div class="flex-1 py-6 space-y-2" id="menu-container">
+        <button onclick="switchSection('profile')" id="btn-profile" class="menu-item active-menu w-full flex items-center px-6 py-4 transition-all text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+            <i class="fa-solid fa-user text-lg mr-4 w-6"></i>
+            <span class="font-medium">내 정보 조회</span>
+        </button>
+        <button onclick="switchSection('appointments')" id="btn-appointments" class="menu-item w-full flex items-center px-6 py-4 transition-all text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+            <i class="fa-solid fa-calendar-check text-lg mr-4 w-6"></i>
+            <span class="font-medium">면회 신청 내역</span>
+        </button>
+        <button onclick="switchSection('register')" id="btn-register" class="menu-item w-full flex items-center px-6 py-4 transition-all text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+            <i class="fa-solid fa-plus-circle text-lg mr-4 w-6"></i>
+            <span class="font-medium">어르신 등록</span>
+        </button>
+    </div>
+</nav>
+
+<div id="sidebar-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"></div>
+
+<main class="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto w-full">
+    <div class="max-w-5xl mx-auto">
+
+        <div id="section-profile" class="section animate-fadeIn">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="h-32 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                <div class="px-8 pb-8">
+                    <div class="relative flex justify-between items-end -mt-12 mb-8">
+                        <div class="w-24 h-24 bg-white rounded-2xl p-1 shadow-lg border-4 border-white">
+                            <img src="https://picsum.photos/seed/user/200" alt="Profile" class="w-full h-full object-cover rounded-xl">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">기본 정보</h3>
+                            <dl class="space-y-4">
+                                <div class="flex flex-col"><dt class="text-sm text-slate-500">성함</dt><dd class="text-lg font-medium text-slate-800" th:text="${seniorInfo.userName}">김철수</dd></div>
+                                <div class="flex flex-col"><dt class="text-sm text-slate-500">이메일</dt><dd class="text-lg font-medium text-slate-800" th:text="${seniorInfo.userEmail}">chulsoo.kim@example.com</dd></div>
+                                <div class="flex flex-col"><dt class="text-sm text-slate-500">연락처</dt><dd class="text-lg font-medium text-slate-800" th:text="${seniorInfo.userPhone}">010-1234-5678</dd></div>
+                                <div class="flex flex-col"><dt class="text-sm text-slate-500">가입일</dt><dd class="text-lg font-medium text-slate-800" th:text="${seniorInfo.createdAt != null ? #strings.substring(seniorInfo.createdAt, 0, 10) : '정보 없음'}">2023-10-15</dd></div>
+                            </dl>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">등록된 어르신 정보</h3>
+                            <div th:if="${#lists.isEmpty(seniorInfo.seniors)}" class="text-slate-500 text-sm">등록된 어르신이 없습니다.</div>
+                            <div th:each="senior : ${seniorInfo.seniors}" class="p-4 border border-slate-200 rounded-lg mb-4 bg-white shadow-sm">
+                                <dl class="space-y-2">
+                                    <div class="flex justify-between"><dt class="text-sm text-slate-500">성함</dt><dd class="font-medium text-slate-800" th:text="${senior.seniorName}">박순자</dd></div>
+                                    <div class="flex justify-between"><dt class="text-sm text-slate-500">관계</dt><dd class="font-medium text-slate-800" th:text="${senior.relationship}">자녀</dd></div>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-appointments" class="section section-hidden animate-fadeIn space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-slate-800">나의 면회 신청 현황</h2>
+                <button onclick="location.href='/visit'" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">신규 면회 예약하기</button>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-600 whitespace-nowrap">예약번호</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-600 whitespace-nowrap">면회 일시</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-600 whitespace-nowrap">대상 어르신</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-600 whitespace-nowrap text-right">상태</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-6 py-4 font-mono text-xs text-slate-500">APPT-001</td>
+                            <td class="px-6 py-4 text-sm">2024-05-20 14:00 (대면)</td>
+                            <td class="px-6 py-4 text-sm font-medium">이영희 어르신</td>
+                            <td class="px-6 py-4 text-right"><span class="px-2 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">승인됨</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-register" class="section section-hidden animate-fadeIn">
+            <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
+                    <h2 class="text-xl font-bold text-slate-800">어르신 신규 등록</h2>
+                    <p class="text-sm text-slate-500 mt-1">입소 중인 어르신의 정보를 입력하여 매칭을 요청하세요.</p>
+                </div>
+                <form id="registerForm" th:action="@{/mypage/register-senior}" method="POST" class="p-6 md:p-8 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-slate-700">어르신 성함</label>
+                            <input type="text" name="seniorName" required placeholder="성함을 입력하세요" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-slate-700">어르신 생년월일</label>
+                            <input type="date" name="seniorBirth" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-700">비상 연락처 (보호자 연락처)</label>
+                        <input type="tel" name="seniorPhone" placeholder="010-0000-0000" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-700">어르신과의 관계</label>
+                        <select name="relationship" required class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white outline-none">
+                            <option value="" disabled selected>관계를 선택하세요</option>
+                            <option value="부">부 (아버지)</option>
+                            <option value="모">모 (어머니)</option>
+                            <option value="자녀">자녀 (아들/딸)</option>
+                            <option value="배우자">배우자</option>
+                            <option value="기타">기타</option>
+                        </select>
+                    </div>
+                    <div class="pt-4 flex gap-4">
+                        <button type="submit" class="flex-1 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md transition-all active:scale-95">등록 요청하기</button>
+                        <button type="button" onclick="switchSection('profile')" class="px-8 py-4 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script>
+    // 1. switchSection 함수는 전역(Global) 공간에 있어야 HTML의 onclick이 인식합니다.
+    function switchSection(sectionId) {
+        // 모든 섹션 숨기기
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.add('section-hidden');
+        });
+
+        // 대상 섹션 보이기
+        const target = document.getElementById('section-' + sectionId);
+        if (target) {
+            target.classList.remove('section-hidden');
+        }
+
+        // 사이드바 메뉴 활성화 상태 업데이트
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.classList.remove('active-menu');
+        });
+        const activeBtn = document.getElementById('btn-' + sectionId);
+        if (activeBtn) {
+            activeBtn.classList.add('active-menu');
+        }
+
+        // 모바일일 경우 사이드바 닫기
+        if (window.innerWidth < 768) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar?.classList.add('-translate-x-full');
+            overlay?.classList.add('hidden');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // 모바일 사이드바 토글 로직
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        mobileMenuBtn?.addEventListener('click', () => {
+            sidebar?.classList.remove('-translate-x-full');
+            overlay?.classList.remove('hidden');
+        });
+
+        overlay?.addEventListener('click', () => {
+            sidebar?.classList.add('-translate-x-full');
+            overlay?.classList.add('hidden');
+        });
+
+        // 어르신 등록 폼 처리 로직
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // 1. 데이터 가져오기
+                const formData = new FormData(this);
+                const relationship = formData.get('relationship');
+                const seniorPhone = formData.get('seniorPhone');
+
+                // 2. 관계 선택 유효성 검사
+                if (!relationship) {
+                    alert("⚠️ 어르신과의 관계를 선택해주세요.");
+                    return;
+                }
+
+                // 3. 전화번호 하이픈(-) 포함 여부 검사 (정규표현식)
+                // 형식: 숫자-숫자-숫자 (예: 010-1234-5678)
+                const phoneRegex = /^\d{2,3}-\d{3,4}-\d{4}$/;
+                if (!phoneRegex.test(seniorPhone)) {
+                    alert("⚠️ 연락처는 하이픈(-)을 포함하여 정확히 입력해주세요.\n(예: 010-0000-0000)");
+                    return;
+                }
+
+                // 검사 통과 후 서버 전송 시작
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/mypage/register-senior', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams(formData)
+                    });
+
+                    const resultText = await response.text();
+                    if (response.ok) {
+                        alert("✨ 어르신 등록이 완료되었습니다!");
+                        location.href = '/visit';
+                    } else {
+                        alert("📢 등록 실패: " + resultText);
+                        submitBtn.disabled = false;
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("서버 통신 중 오류가 발생했습니다.");
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

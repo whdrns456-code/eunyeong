@@ -15,10 +15,106 @@
             <li><a th:href="@{/visit}">면회신청</a></li>
         </ul>
     </nav>
-
     <ul class="header-right nav-links">
-        <li><a th:href="@{/login}" class="auth-link">로그인</a></li>
-        <li><a th:href="@{/signup}" class="auth-link">회원가입</a></li>
+        <th:block th:if="${#authorization.expression('isAnonymous()')}">
+            <li><a th:href="@{/login}" class="auth-link">로그인</a></li>
+            <li><a th:href="@{/signup}" class="auth-link">회원가입</a></li>
+        </th:block>
+
+        <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+            <li class="session-timer" style="color: #e74c3c; font-weight: bold; font-size: 0.85rem;">
+                <i class="fa-regular fa-clock"></i> <span id="timer-display">30:00</span>
+            </li>
+            <li><a th:href="@{/mypage}" class="auth-link">마이페이지</a></li>
+            <li>
+                <a href="javascript:void(0);" onclick="logout()" class="auth-link">로그아웃</a>
+            </li>
+            <li class="user-welcome">
+                <span th:text="${#authentication.name} + '님 환영합니다!'">님</span>
+            </li>
+        </th:block>
     </ul>
+
+    <script>
+
+
+        async function logout() {
+            // 1. 사용자에게 한 번 더 확인 (보안 및 UX)
+            if (!confirm('로그아웃 하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                // 2. 서버의 로그아웃 API에 POST 요청 전송
+                const response = await fetch('/api/member/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // 3. 로그아웃 성공 시 알림 후 메인 페이지로 이동
+                    alert('안전하게 로그아웃되었습니다.');
+                    window.location.href = '/';
+                } else {
+                    alert('로그아웃 처리 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Logout Error:', error);
+                alert('서버와 통신할 수 없습니다.');
+            }
+        }
+
+        let timeLeft = 1800; // 30분 기준 (초 단위)
+        let timerInterval;
+
+        // 2. 페이지 로드 시 타이머 시작
+        document.addEventListener('DOMContentLoaded', () => {
+            // 세션 타이머 요소가 존재하는 경우에만 실행 (로그인 상태일 때만)
+            if (document.getElementById('timer-display')) {
+                timerInterval = setInterval(updateTimer, 1000); // 1초(1000ms)마다 updateTimer 실행
+            }
+        });
+
+        // 3. 기존에 작성한 updateTimer 함수
+        function updateTimer() {
+            const display = document.getElementById('timer-display');
+            const timerParent = document.querySelector('.session-timer');
+            if (!display) return;
+
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+
+            display.innerText =
+                (minutes < 10 ? "0" + minutes : minutes) + ":" +
+                (seconds < 10 ? "0" + seconds : seconds);
+
+            if (timeLeft <= 60 && timeLeft > 0) {
+                timerParent.style.color = "#ff4757";
+                timerParent.style.opacity = (timeLeft % 2 === 0) ? "1" : "0.3";
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                autoLogout(); // 세션 만료 시 자동 로그아웃 실행
+            }
+            timeLeft--;
+        }
+
+        // 4. 자동 로그아웃 함수 추가 (보안상 필수!)
+        async function autoLogout() {
+            alert("세션 시간이 만료되어 안전하게 로그아웃됩니다.");
+            const response = await fetch('/api/member/logout', { method: 'POST' });
+            if (response.ok) {
+                window.location.href = '/login';
+            }
+        }
+    </script>
+
 </header>
+
+
+
+
 </html>

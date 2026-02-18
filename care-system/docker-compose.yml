@@ -1,0 +1,39 @@
+# 수정된 docker-compose.yml (이걸 프로젝트 폴더로 옮기세요)
+version: '3.8'
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:latest
+    container_name: my-secure-oracle
+    # AWS 배포 시 외부에서 DB에 직접 접속할 일이 없다면 ports는 삭제하는 게 보안상 좋습니다.
+    environment:
+      - ORACLE_PASSWORD=${ORACLE_ROOT_PASSWORD} # 변수 처리
+      - APP_USER=${DB_USERNAME}
+      - APP_USER_PASSWORD=${DB_USERPASSWORD}
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+    networks:
+      - backend-net
+
+  app:
+    build: .
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - oracle-db
+    environment:
+      - DB_HOST=oracle-db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_USERPASSWORD=${DB_USERPASSWORD}
+      - MAP_API_KEY=${MAP_API_KEY}
+      - MAIL_ID=${MAIL_ID}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+    networks:
+      - backend-net
+
+networks:
+  backend-net:
+    driver: bridge
+
+volumes:
+  oracle_data:

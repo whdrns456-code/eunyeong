@@ -1,13 +1,466 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>힐링 프리미엄 실버케어 - 진심을 담은 요양 서비스</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/header.css}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --off-white: #FDFCFB;
+            --emerald-primary: #059669;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--off-white);
+            color: #1c1917;
+            scroll-behavior: smooth;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .tab-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease;
+            opacity: 0;
+        }
+        .tab-content.open {
+            max-height: 500px;
+            opacity: 1;
+        }
+        .custom-shape-divider {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+    </style>
 </head>
-<body>
+<body class="overflow-x-hidden">
+
+<!-- [상단] 네비게이션 -->
 <header th:replace="~{header/header :: mainHeader}"></header>
 
+<!-- Hero Section -->
+<section class="relative pt-40 pb-24 px-6 overflow-hidden">
+    <div class="max-w-7xl mx-auto text-center relative z-10">
+        <span class="inline-block px-5 py-2 bg-emerald-50 text-emerald-700 text-xs font-black rounded-full mb-8 border border-emerald-100 tracking-widest uppercase">은영요양시설 & 주간보호센터</span>
+        <h1 class="text-4xl md:text-7xl font-bold text-stone-900 mb-8 leading-[1.15]">
+
+            <span class="text-emerald-600 italic">따듯한 돌봄</span>이 실천 곳
+        </h1>
+        <p class="text-lg md:text-xl text-stone-500 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+            우리는 단순한 돌봄을 넘어, 부모님의 존엄성과 행복을 최우선으로 생각합니다.
+            <br>전문 의료 시스템과 따뜻한 커뮤니티가 어우러진 최상의 환경을 약속드립니다.
+        </p>
+
+    </div>
+
+    <!-- Background decorative elements -->
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-emerald-50 rounded-full blur-3xl opacity-60"></div>
+    <div class="absolute top-1/2 -right-24 w-80 h-80 bg-stone-100 rounded-full blur-3xl opacity-60"></div>
+</section>
+
+<!-- [1. 상단] 인증 및 수상 내역 (Trust) -->
+<section class="bg-white py-16 border-y border-stone-100">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div class="lg:w-1/4 text-center lg:text-left">
+                <h3 class="text-stone-400 font-bold uppercase tracking-widest text-xs mb-3">은영요양시설&주간보호센터</h3>
+                <p class="text-2xl font-bold text-stone-800 leading-tight">신뢰할 수 있는<br>국가 공인 우수 기관</p>
+            </div>
+            <div class="lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-8">
+                <div class="reveal flex flex-col items-center lg:items-start gap-3 p-6 bg-stone-50 rounded-3xl transition-transform hover:-translate-y-1">
+                    <div class="p-3 bg-amber-50 rounded-2xl">
+                        <i data-lucide="award" class="text-amber-600 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-stone-800 mb-1">장기요양기관 우수 등급</p>
+                        <p class="text-sm text-stone-500">2025 국민건강보험공단 평가</p>
+                    </div>
+                </div>
+                <div class="reveal flex flex-col items-center lg:items-start gap-3 p-6 bg-stone-50 rounded-3xl transition-transform hover:-translate-y-1" style="transition-delay: 0.1s;">
+                    <div class="p-3 bg-blue-50 rounded-2xl">
+                        <i data-lucide="medal" class="text-rose-600 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-stone-800 mb-1">보건복지부장관상 표창장</p>
+                        <p class="text-sm text-stone-500">최영수 원장님</p>
+                    </div>
+                </div>
+                <div class="reveal flex flex-col items-center lg:items-start gap-3 p-6 bg-stone-50 rounded-3xl transition-transform hover:-translate-y-1" style="transition-delay: 0.2s;">
+                    <div class="p-3 bg-rose-50 rounded-2xl">
+                        <i data-lucide="medal" class="text-rose-600 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-stone-800 mb-1">국민건강보험공단상 표창장</p>
+                        <p class="text-sm text-stone-500">최영수 원장님</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- [2. 선택] 서비스 분기점 (Selection) -->
+<section id="selection" class="py-24 px-6 bg-[#FDFCFB]">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-4">어르신께 꼭 필요한 돌봄은 무엇인가요?</h2>
+            <p class="text-stone-500 font-light">생활 여건과 건강 상태에 맞춰 선택하는 두 가지 핵심 솔루션</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-10">
+            <!-- 입소 시설 Card -->
+            <div class="reveal bg-white border border-stone-200 rounded-[2.5rem] p-10 card-hover transition-all duration-500">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center">
+                        <i data-lucide="home" class="text-emerald-600 w-8 h-8"></i>
+                    </div>
+                    <span class="px-4 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100 uppercase tracking-tighter">Stay Care</span>
+                </div>
+                <h3 class="text-3xl font-bold text-stone-900 mb-4">요양 시설 (입소)</h3>
+                <p class="text-stone-500 mb-8 leading-relaxed font-light">
+                    24시간 전문적인 의료 지원과 생활 밀착 케어가 필요한 어르신을 위한 프리미엄 주거형 서비스입니다.
+                </p>
+
+                <div class="space-y-6 mb-10">
+                    <div class="flex items-start gap-4">
+                        <div class="mt-1"><i data-lucide="check-circle-2" class="text-emerald-500 w-5 h-5"></i></div>
+                        <div>
+                            <p class="font-bold text-stone-800">24시간 거주형 생활</p>
+                            <p class="text-sm text-stone-500">숙박, 식사, 건강관리를 포함한 종합 솔루션</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="mt-1"><i data-lucide="check-circle-2" class="text-emerald-500 w-5 h-5"></i></div>
+                        <div>
+                            <p class="font-bold text-stone-800">집중 의료 돌봄</p>
+                            <p class="text-sm text-stone-500">와병 어르신 또는 고령의 치매 어르신 최적화</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="toggleDetails('nursing-details')" class="group w-full py-5 bg-stone-900 text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all shadow-lg">
+                    입소 서비스 자세히 보기 <i data-lucide="plus-circle" class="w-5 h-5 group-hover:rotate-90 transition-transform"></i>
+                </button>
+
+                <div id="nursing-details" class="tab-content">
+                    <div class="mt-8 pt-8 border-t border-stone-100">
+                        <h4 class="font-bold text-stone-800 mb-4">입소 상세 안내</h4>
+                        <ul class="space-y-3 text-sm text-stone-600">
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> 호텔급 1, 2인실 및 다인실 운영</li>
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> 전담 간호사 24시간 모니터링</li>
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> 특화된 인지/신체 재활 프로그램 상시 운영</li>
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> 정기적인 계약 의사 회진 및 건강 체크</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 주간보호 센터 Card -->
+            <div class="reveal bg-white border border-stone-200 rounded-[2.5rem] p-10 card-hover transition-all duration-500" style="transition-delay: 0.1s;">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center">
+                        <i data-lucide="truck" class="text-blue-600 w-8 h-8"></i>
+                    </div>
+                    <span class="px-4 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-100 uppercase tracking-tighter">Day Care</span>
+                </div>
+                <h3 class="text-3xl font-bold text-stone-900 mb-4">주간보호 센터 (데이케어)</h3>
+                <p class="text-stone-500 mb-8 leading-relaxed font-light">
+                    낮 시간 동안 사회적 교류와 전문 프로그램을 통해 고립감을 해소하고 가족의 수고를 덜어드리는 통근형 서비스입니다.
+                </p>
+
+                <div class="space-y-6 mb-10">
+                    <div class="flex items-start gap-4">
+                        <div class="mt-1"><i data-lucide="check-circle-2" class="text-blue-500 w-5 h-5"></i></div>
+                        <div>
+                            <p class="font-bold text-stone-800">낮 시간 픽업 서비스</p>
+                            <p class="text-sm text-stone-500">자택 앞까지 모시러 가고 모셔다 드리는 송영 시스템</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="mt-1"><i data-lucide="check-circle-2" class="text-blue-500 w-5 h-5"></i></div>
+                        <div>
+                            <p class="font-bold text-stone-800">사회적 관계 형성</p>
+                            <p class="text-sm text-stone-500">또래 어르신들과의 즐거운 소통과 프로그램 참여</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="toggleDetails('daycare-details')" class="group w-full py-5 bg-stone-900 text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-blue-600 transition-all shadow-lg">
+                    주간보호 상세 보기 <i data-lucide="plus-circle" class="w-5 h-5 group-hover:rotate-90 transition-transform"></i>
+                </button>
+
+                <div id="daycare-details" class="tab-content">
+                    <div class="mt-8 pt-8 border-t border-stone-100">
+                        <h4 class="font-bold text-stone-800 mb-4">주간보호 상세 안내</h4>
+                        <ul class="space-y-3 text-sm text-stone-600">
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-400"></div> 오전 8시 ~ 오후 6시 (시간 협의 가능)</li>
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-400"></div> 균형 잡힌 점심 식사 및 오후 영양 간식 제공</li>
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-400"></div> 미술, 음악, 실버 요가 등 외부 전문 강사 프로그램</li>
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-400"></div> 토요일 운영으로 가족의 주말 휴식 보장</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- [3. 프로그램] 맞춤형 케어 서비스 (Activity) -->
+<section id="program" class="py-24 px-6 bg-white">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+            <div class="max-w-xl">
+                <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-6">활기찬 일상을 위한<br>프리미엄 활동 프로그램</h2>
+                <p class="text-stone-500 font-light">매달 업데이트되는 다채로운 프로그램은 어르신들의 인지 기능 유지와 정서적 안정에 큰 도움을 줍니다.</p>
+            </div>
+            <div class="mt-8 md:mt-0">
+                <button class="px-8 py-3 bg-stone-50 text-stone-700 font-bold rounded-full hover:bg-stone-100 transition-all border border-stone-200 text-sm">이번 달 시간표 보기</button>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Activity 1 -->
+            <div class="reveal group" style="transition-delay: 0s;">
+                <div class="relative h-72 rounded-3xl overflow-hidden mb-6 shadow-xl">
+                    <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800" alt="실버 요가" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                    <span class="absolute top-4 left-4 px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black text-emerald-700 uppercase tracking-widest shadow-lg">Body Health</span>
+                </div>
+                <h4 class="text-xl font-bold text-stone-800 mb-3">맞춤형 실버 재활 요가</h4>
+                <p class="text-stone-500 text-sm leading-relaxed font-light">유연성을 높이고 근력을 강화하여 낙상을 예방하고 일상의 활력을 되찾아 드리는 전문 신체 활동입니다.</p>
+            </div>
+            <!-- Activity 2 -->
+            <div class="reveal group" style="transition-delay: 0.1s;">
+                <div class="relative h-72 rounded-3xl overflow-hidden mb-6 shadow-xl">
+                    <img src="https://images.unsplash.com/photo-1460662136037-3fd27114643b?auto=format&fit=crop&q=80&w=800" alt="미술 치료" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                    <span class="absolute top-4 left-4 px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black text-blue-700 uppercase tracking-widest shadow-lg">Cognitive</span>
+                </div>
+                <h4 class="text-xl font-bold text-stone-800 mb-3">오감 자극 미술 테라피</h4>
+                <p class="text-stone-500 text-sm leading-relaxed font-light">외부 전문 강사를 초빙하여 창작 활동을 통해 인지 능력을 자극하고 성취감을 느낄 수 있는 심리 지원 프로그램입니다.</p>
+            </div>
+            <!-- Activity 3 -->
+            <div class="reveal group" style="transition-delay: 0.2s;">
+                <div class="relative h-72 rounded-3xl overflow-hidden mb-6 shadow-xl">
+                    <img src="https://images.unsplash.com/photo-1512413316925-fd47914c9c22?auto=format&fit=crop&q=80&w=800" alt="원예 테라피" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                    <span class="absolute top-4 left-4 px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black text-amber-700 uppercase tracking-widest shadow-lg">Emotional</span>
+                </div>
+                <h4 class="text-xl font-bold text-stone-800 mb-3">정서 안정 원예 교실</h4>
+                <p class="text-stone-500 text-sm leading-relaxed font-light">흙을 만지고 식물을 가꾸며 자연과 교감하고 정서적 평온을 찾는 힐링 테라피 서비스입니다.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- [4. 식단] 직영 주방 & 수제 식단 (Nutrition) -->
+<section id="nutrition" class="relative py-32 px-6 overflow-hidden bg-stone-900 text-white">
+    <div class="absolute inset-0 opacity-40">
+        <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=1920" alt="주방" class="w-full h-full object-cover">
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto flex flex-col items-center text-center">
+        <div class="p-4 bg-white/10 backdrop-blur-md rounded-3xl mb-10 border border-white/20">
+            <i data-lucide="utensils" class="w-10 h-10 text-emerald-400"></i>
+        </div>
+        <h2 class="text-4xl md:text-6xl font-bold mb-8 leading-tight">건강의 시작은<br><span class="text-emerald-400">매일 직접 조리</span>하는 한 끼 식사</h2>
+        <p class="text-lg md:text-xl text-stone-300 max-w-3xl mb-16 font-light">
+            우리는 위탁 급식을 하지 않습니다. <br>
+            시설 직영 주방에서 영양사가 설계한 저염 맞춤형 식단으로 어르신의 기력 보강과 소화를 돕습니다.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-8 w-full">
+            <div class="reveal bg-white/5 backdrop-blur-lg p-8 rounded-[2rem] border border-white/10 text-left">
+                <h5 class="text-emerald-400 font-bold mb-3">신선한 제철 식재료</h5>
+                <p class="text-stone-400 text-sm font-light">매일 아침 엄선된 신선한 채소와 육류로 조리하여 건강한 생기를 드립니다.</p>
+            </div>
+            <div class="reveal bg-white/5 backdrop-blur-lg p-8 rounded-[2rem] border border-white/10 text-left" style="transition-delay: 0.1s;">
+                <h5 class="text-emerald-400 font-bold mb-3">저염·고단백 맞춤식</h5>
+                <p class="text-stone-400 text-sm font-light">혈압과 당뇨 관리가 필요한 어르신을 위해 자극 없는 영양 식단을 제공합니다.</p>
+            </div>
+            <div class="reveal bg-white/5 backdrop-blur-lg p-8 rounded-[2rem] border border-white/10 text-left" style="transition-delay: 0.2s;">
+                <h5 class="text-emerald-400 font-bold mb-3">수제 영양 간식</h5>
+                <p class="text-stone-400 text-sm font-light">직접 만든 죽, 떡, 과일 등 정성이 담긴 간식을 매일 오후 제공합니다.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- [5. 물리 치료실 & 의료 시설] -->
+<section id="facility" class="py-24 px-6 bg-[#FDFCFB]">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-20 items-center mb-32">
+            <div class="reveal order-2 lg:order-1">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-bold mb-6 uppercase tracking-widest">Rehabilitation Center</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-8 leading-tight">전문 장비를 갖춘<br>맞춤형 물리치료실 운영</h2>
+                <p class="text-lg text-stone-600 mb-10 leading-relaxed font-light">
+                    저주파 치료기, 적외선 요법, 평행봉 보행 연습기 등 최신 재활 장비를 완비하고 어르신 개인별 상태에 최적화된 재활 서비스를 제공합니다.
+                </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-6 bg-white rounded-2xl border border-stone-100 shadow-sm flex flex-col gap-3">
+                        <i data-lucide="activity" class="text-emerald-600 w-6 h-6"></i>
+                        <span class="font-bold text-stone-800">통증 완화 케어</span>
+                    </div>
+                    <div class="p-6 bg-white rounded-2xl border border-stone-100 shadow-sm flex flex-col gap-3">
+                        <i data-lucide="walking" class="text-emerald-600 w-6 h-6"></i>
+                        <span class="font-bold text-stone-800">보행 재활 훈련</span>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal order-1 lg:order-2">
+                <div class="relative rounded-[3rem] overflow-hidden shadow-2xl">
+                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1200" alt="물리치료실" class="w-full aspect-[4/3] object-cover">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-20 items-center">
+            <div class="reveal">
+                <div class="relative rounded-[3rem] overflow-hidden shadow-2xl">
+                    <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80&w=1200" alt="간호시설" class="w-full aspect-[4/3] object-cover">
+                </div>
+            </div>
+            <div class="reveal">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-stone-100 text-stone-600 rounded-full text-xs font-bold mb-6 uppercase tracking-widest">Medical Support</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-8 leading-tight">계약 의사 정기 회진 &<br>24시간 보호 체계</h2>
+                <p class="text-lg text-stone-600 mb-10 leading-relaxed font-light">
+                    협력 병원과의 연계를 통해 전문 의사가 정기적으로 회진하며, 24시간 상주하는 전문 인력이 응급 상황에 즉각 대처할 수 있는 의료 망을 구축하고 있습니다.
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-center gap-3 font-medium text-stone-800">
+                        <i data-lucide="check-circle-2" class="text-emerald-600 w-5 h-5"></i>
+                        정기 계약 의사 방문 회진
+                    </li>
+                    <li class="flex items-center gap-3 font-medium text-stone-800">
+                        <i data-lucide="check-circle-2" class="text-emerald-600 w-5 h-5"></i>
+                        투약 관리 및 매일 건강 상태 체크
+                    </li>
+                    <li class="flex items-center gap-3 font-medium text-stone-800">
+                        <i data-lucide="check-circle-2" class="text-emerald-600 w-5 h-5"></i>
+                        인근 대형 병원과의 긴급 이송 시스템
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- [6. 하단] 상담 안내 Footer -->
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-100">
+                    <i data-lucide="heart" class="text-white w-6 h-6"></i>
+                </div>
+                <span class="text-2xl font-bold tracking-tight text-emerald-800">따뜻한 돌봄</span>
+            </div>
+
+            <h3 class="text-3xl font-bold mb-8 text-stone-800 leading-tight">
+                부모님의 소중한 하루가<br>
+                <span class="text-emerald-600">행복과 편안함</span>으로 채워집니다.
+            </h3>
+
+            <div class="space-y-5">
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-stone-100 shadow-sm">
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                        <i data-lucide="map-pin" class="text-emerald-600 w-5 h-5"></i>
+                    </div>
+                    <span class="text-stone-600 font-medium">강원도 강릉시 경포로 100번길 20-1</span>
+                </div>
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-stone-100 shadow-sm">
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                        <i data-lucide="calendar" class="text-emerald-600 w-5 h-5"></i>
+                    </div>
+                    <span class="text-stone-600 font-medium">운영 시간: 연중무휴 (주간보호 월~토)</span>
+                </div>
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-stone-100 shadow-sm">
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                        <i data-lucide="mail" class="text-emerald-600 w-5 h-5"></i>
+                    </div>
+                    <span class="text-stone-600 font-medium">whdrns456@gmail.com</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-stone-50 rounded-[2.5rem] p-10 flex flex-col justify-center border border-stone-200 shadow-xl shadow-stone-200/50">
+            <p class="text-emerald-600 font-bold uppercase tracking-widest text-xs mb-3 text-center">Fast Consultation</p>
+            <h4 class="text-2xl font-bold mb-8 text-stone-800 text-center">궁금하신 점이 있으신가요?</h4>
+
+            <a href="tel:033-645-7573" class="group flex items-center justify-between bg-emerald-600 p-7 rounded-3xl hover:bg-emerald-700 transition-all duration-300 shadow-lg shadow-emerald-200">
+                <div>
+                    <p class="text-emerald-100 text-sm font-medium mb-1">입소 / 주간보호 상담전화</p>
+                    <p class="text-3xl font-extrabold text-white tracking-tight">033-645-7573</p>
+                </div>
+                <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform">
+                    <i data-lucide="phone-call" class="text-white w-7 h-7"></i>
+                </div>
+            </a>
+
+            <div class="mt-8 flex flex-col gap-3">
+                <p class="text-stone-500 text-sm text-center flex items-center justify-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4"></i>
+                    시설 방문 상담은 100% 예약제로 운영됩니다.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. 아이콘 즉시 실행
+    lucide.createIcons();
+
+    // 2. 스크롤 애니메이션 (Reveal)
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // 3. 상세 보기 토글 기능
+    function toggleDetails(id) {
+        const content = document.getElementById(id);
+        if (content) {
+            content.classList.toggle('open');
+        }
+    }
+
+    // 4. 네비게이션 스크롤 효과 (에러 방지 처리)
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('nav');
+        if (nav) {
+            window.scrollY > 50 ? nav.classList.add('py-2') : nav.classList.remove('py-2');
+        }
+    });
+</script>
 
 </body>
 </html>

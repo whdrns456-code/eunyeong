@@ -1,12 +1,473 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-  <link rel="stylesheet" th:href="@{/css/header.css}">
-</head>
-<body>
-<header th:replace="~{header/header :: mainHeader}"></header>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - 힐링 프리미엄 실버케어</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFCFB; /* Off-white */
+            color: #1c1917;
+        }
+        .input-focus:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+        .strength-bar {
+            height: 6px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+            border-radius: 999px;
+        }
+        .reveal-node {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Hidden verification section */
+        #verificationArea {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.4s ease;
+            opacity: 0;
+        }
+        #verificationArea.visible {
+            max-height: 200px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+    </style>
 
+    <link rel="stylesheet" href="/index.css">
+</head>
+<header th:replace="~{header/header :: mainHeader}"></header>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-8 md:p-12 lg:p-20">
+
+<!-- 회원가입 카드 컨테이너 -->
+<div class="w-full max-w-[520px] bg-white rounded-[2.5rem] shadow-[0_30px_60px_rgba(30,58,138,0.08)] p-8 sm:p-12 reveal-node border border-blue-50/50">
+
+    <!-- 로고 및 헤더 -->
+    <div class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-3xl shadow-xl shadow-blue-200/50 mb-6 transition-transform hover:scale-110">
+            <i data-lucide="user-plus" class="text-white w-8 h-8"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-stone-900 tracking-tight">회원가입</h1>
+        <p class="text-stone-500 text-sm mt-3 font-light">어르신과 가족을 위한 특별한 시작을 함께하세요.</p>
+    </div>
+
+    <form id="registerForm" class="space-y-6">
+        <!-- 아이디 -->
+        <div class="space-y-2.5">
+            <label class="block text-sm font-bold text-stone-700 ml-1">아이디</label>
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <input type="text" id="userId" name="userId" placeholder="아이디" required
+                       class="flex-1 px-5 py-4 bg-stone-50/80 border border-stone-200 rounded-2xl text-sm input-focus transition-all">
+                <button type="button" onclick="checkDuplicateId()"
+                        class="px-6 py-4 bg-blue-50 text-blue-700 font-bold rounded-2xl text-xs hover:bg-blue-100 transition-all border border-blue-100 whitespace-nowrap active:scale-95">
+                    중복 확인
+                </button>
+            </div>
+            <p id="idMsg" class="text-[11px] ml-1 min-h-[1rem]"></p>
+        </div>
+
+        <!-- 이름 -->
+        <div class="space-y-2.5">
+            <label class="block text-sm font-bold text-stone-700 ml-1">이름</label>
+            <input type="text" id="userName" name="userName" placeholder="실명을 입력하세요" required
+                   class="w-full px-5 py-4 bg-stone-50/80 border border-stone-200 rounded-2xl text-sm input-focus transition-all">
+        </div>
+
+        <!-- 비밀번호 -->
+        <div class="space-y-2.5">
+            <label class="block text-sm font-bold text-stone-700 ml-1">비밀번호 <span class="font-normal text-stone-400 text-xs">(8~11자)</span></label>
+            <input type="password" id="userPw" name="userPw" placeholder="영문/숫자/특수문자 조합" required maxlength="11"
+                   class="w-full px-5 py-4 bg-stone-50/80 border border-stone-200 rounded-2xl text-sm input-focus transition-all">
+
+            <div class="px-1 pt-1">
+                <div class="w-full bg-stone-100 rounded-full h-1.5 overflow-hidden">
+                    <div id="strengthBar" class="strength-bar bg-stone-300"></div>
+                </div>
+                <div class="flex justify-between items-center text-[10px] font-bold mt-2">
+                    <span id="strengthText" class="text-stone-400">보안 등급 대기</span>
+                    <span id="pwLength" class="text-stone-400">0/11</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 비밀번호 확인 -->
+        <div class="space-y-2.5">
+            <label class="block text-sm font-bold text-stone-700 ml-1">비밀번호 재확인</label>
+            <input type="password" id="userPwConfirm" placeholder="비밀번호 확인" required
+                   class="w-full px-5 py-4 bg-stone-50/80 border border-stone-200 rounded-2xl text-sm input-focus transition-all">
+            <p id="pwMatchMsg" class="text-[11px] ml-1 min-h-[1rem]"></p>
+        </div>
+
+        <!-- 이메일 및 인증번호 -->
+        <div class="space-y-2.5">
+            <label class="block text-sm font-bold text-stone-700 ml-1">이메일 인증</label>
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <input type="email" id="userEmail" name="userEmail" placeholder="example@care.com" required
+                       class="flex-1 px-5 py-4 bg-stone-50/80 border border-stone-200 rounded-2xl text-sm input-focus transition-all">
+                <button type="button" id="sendEmailBtn" onclick="requestVerification()"
+                        class="px-6 py-4 bg-stone-900 text-white font-bold rounded-2xl text-xs hover:bg-blue-600 transition-all shadow-lg active:scale-95">
+                    인증 요청
+                </button>
+            </div>
+
+            <!-- 인증번호 입력 칸 (인증 요청 후 등장) -->
+            <div id="verificationArea" class="space-y-2.5">
+                <div class="flex flex-col sm:flex-row gap-2.5">
+                    <input type="text" id="verificationCode" placeholder="인증번호 6자리" maxlength="6"
+                           class="flex-1 px-5 py-4 bg-blue-50/50 border border-blue-200 rounded-2xl text-sm input-focus transition-all font-mono tracking-widest text-center">
+                    <button type="button" onclick="verifyCode()"
+                            class="px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl text-xs hover:bg-blue-700 transition-all active:scale-95 shadow-md shadow-blue-100">
+                        번호 확인
+                    </button>
+                </div>
+                <p id="verifyMsg" class="text-[11px] ml-1 min-h-[1rem]"></p>
+            </div>
+        </div>
+
+        <!-- 약관 동의 -->
+        <div class="pt-4">
+            <div class="flex items-start gap-4 p-5 bg-blue-50/30 rounded-3xl border border-blue-100/50 hover:bg-blue-50 transition-colors">
+                <input type="checkbox" id="agreeCheck" required
+                       class="w-5 h-5 mt-1 rounded border-stone-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                <label for="agreeCheck" class="text-xs text-stone-600 cursor-pointer leading-relaxed">
+                    <span class="font-bold text-blue-700">[필수]</span> 개인정보 수집 및 이용 통신 체크 박스. 동의하지 않을 경우 회원가입이 불가능합니다.
+                </label>
+            </div>
+        </div>
+
+        <!-- 최종 가입 버튼 -->
+        <button type="submit" id="submitBtn"
+                class="w-full py-5 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 mt-6 active:scale-95 flex items-center justify-center gap-2">
+            가입하기 <i data-lucide="check" class="w-5 h-5"></i>
+        </button>
+    </form>
+
+    <p class="text-center text-xs text-stone-400 mt-10">계정이 이미 있으신가요? <a href="./login" class="text-blue-600 font-bold hover:underline">로그인 페이지로</a></p>
+</div>
+
+<!-- Hidden element for React-Free build compatibility -->
+<div id="root" style="display: none;"></div>
+
+<script>
+    lucide.createIcons();
+
+    // 상태 관리 변수
+    let isIdValid = false;
+    let isEmailVerified = false;
+    let serverAuthCode = ""; // 서버에서 받은 인증번호 저장용
+
+    // DOM 요소 참조
+    const idInput = document.getElementById('userId');
+    const idMsg = document.getElementById('idMsg');
+    const pwInput = document.getElementById('userPw');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const pwLengthText = document.getElementById('pwLength');
+    const pwConfirm = document.getElementById('userPwConfirm');
+    const pwMatchMsg = document.getElementById('pwMatchMsg');
+    const verifyArea = document.getElementById('verificationArea');
+    const verifyMsg = document.getElementById('verifyMsg');
+    const sendEmailBtn = document.getElementById('sendEmailBtn');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // [Async] 아이디 중복 검증 (실제 서버 연동 시 fetch로 변경 필요)
+    async function checkDuplicateId() {
+        const id = idInput.value;
+        // 영문과 숫자가 반드 시 하나 이상 포함되게
+        const idRegex = /^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{8,12}$/;
+
+        if (!id) {
+            alert('아이디를 입력해주세요.');
+            return;
+        }
+
+        if (!idRegex.test(id)) {
+            idMsg.textContent = '8~12자의 영문 소문자와 숫자를 혼합해서 입력해주세요.';
+            idMsg.className = 'text-[11px] ml-1 text-rose-500 font-bold';
+            return;
+        }
+
+
+        idMsg.textContent = '조회 중...';
+        idMsg.className = 'text-[11px] ml-1 text-stone-400';
+
+        try {
+            const response = await fetch('/api/member/checkId', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: id })
+            });
+
+
+            const data = await response.text();
+            const isDuplicated = (data === 'true');
+
+
+            if(isDuplicated) {
+                idMsg.textContent = '이미 사용 중인 아이디입니다.';
+                idMsg.className = 'text-[11px] ml-1 text-rose-500 font-bold';
+                isIdValid = false;
+            } else {
+                idMsg.textContent = '사용 가능한 아이디입니다.';
+                idMsg.className = 'text-[11px] ml-1 text-blue-600 font-bold';
+                isIdValid = true;
+               }
+        } catch(e) {
+            idMsg.textContent = '서버 통신 오류가 발생했습니다.';
+            alert(e);
+        }
+    }
+
+    // 비밀번호 보안 등급 실시간 체크
+    pwInput.addEventListener('input', () => {
+        const val = pwInput.value;
+        const len = val.length;
+        pwLengthText.textContent = `${len}/11`;
+
+        // 필수 조건: 영문 소문자와 숫자가 반드시 포함된 8~11자
+        const isBasicValid = /[a-z]/.test(val) && /[0-9]/.test(val);
+
+        let score = 0;
+        if (len >= 8) {
+            // 필수 요소 (점수 반영)
+            if (/[a-z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+
+            // 선택 요소 (추가 점수)
+            if (/[A-Z]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+        }
+
+        const grades = [
+            { t: '최소 8자 이상 입력', c: 'bg-stone-200', tc: 'text-stone-400', w: '10%' },
+            { t: '조건 미달 (영문 소문자/숫자 조합 필수)', c: 'bg-rose-500', tc: 'text-rose-500', w: '30%' },
+            { t: '보통 (필수 조건 충족)', c: 'bg-amber-500', tc: 'text-amber-500', w: '60%' },
+            { t: '안전함 (대문자/특수문자 포함)', c: 'bg-blue-600', tc: 'text-blue-600', w: '85%' },
+            { t: '최상위 보안 등급', c: 'bg-emerald-500', tc: 'text-emerald-500', w: '100%' }
+        ];
+
+        let current;
+        if (len < 8) {
+            current = grades[0];
+        } else if (!isBasicValid) {
+            current = grades[1];
+        } else {
+            // score가 2(소문자+숫자)일 때 grades[2]가 출력되도록 매칭
+            // 만약 대문자/특수문자까지 추가되면 score가 3 또는 4가 됨
+            current = grades[score] || grades[2];
+        }
+
+        strengthBar.className = `strength-bar ${current.c}`;
+        strengthBar.style.width = current.w;
+        strengthText.textContent = `보안 등급: ${current.t}`;
+        strengthText.className = `font-bold ${current.tc}`;
+
+        validatePwMatch();
+    });
+
+    // 비밀번호 확인 검증
+    function validatePwMatch() {
+        if(!pwConfirm.value) { pwMatchMsg.textContent = ''; return; }
+        if(pwInput.value === pwConfirm.value) {
+            pwMatchMsg.textContent = '비밀번호가 일치합니다.';
+            pwMatchMsg.className = 'text-[11px] ml-1 text-blue-600 font-bold';
+        } else {
+            pwMatchMsg.textContent = '비밀번호가 서로 다릅니다.';
+            pwMatchMsg.className = 'text-[11px] ml-1 text-rose-500 font-bold';
+        }
+    }
+    pwConfirm.addEventListener('input', validatePwMatch);
+
+    // [Async] 이메일 인증번호 요청
+    async function requestVerification() {
+        const email = document.getElementById('userEmail').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            alert('올바른 이메일 형식을 입력하세요.');
+            return;
+        }
+
+        const sendEmailBtn = document.getElementById('sendEmailBtn'); // 변수 선언 확인
+        sendEmailBtn.disabled = true;
+        sendEmailBtn.innerHTML = '<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> 검사 중...';
+        if(window.lucide) lucide.createIcons();
+
+        try {
+            // 1. 이메일 중복 체크
+            const checkRes = await fetch('/api/member/checkEmail', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({userEmail: email})
+            });
+
+            const checkResult = await checkRes.text();
+            const isDuplicated = (checkResult.trim() === 'true');
+
+            if (isDuplicated) {
+                alert('이미 가입된 이메일 주소입니다. 다른 이메일을 사용해주세요.');
+                sendEmailBtn.innerHTML = '인증 요청';
+                sendEmailBtn.disabled = false;
+                return; // 중복이면 여기서 종료
+            }
+
+            // 2. 이메일 발송
+            sendEmailBtn.innerHTML = '<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> 발송 중...';
+            const response = await fetch(`/api/mail/mailTest?email=${encodeURIComponent(email)}`);
+
+            if (response.ok) {
+                serverAuthCode = (await response.text()).trim();
+                alert('인증번호가 이메일로 발송되었습니다!');
+                console.log('테스트용 확인(서버코드):', serverAuthCode);
+
+                document.getElementById('verificationArea').classList.add('visible');
+                sendEmailBtn.innerHTML = '재요청';
+            } else {
+                throw new Error('발송 실패');
+            }
+
+        } catch (e) {
+            alert('처리 중 오류가 발생했습니다.');
+            console.error(e);
+            sendEmailBtn.innerHTML = '인증 요청';
+        } finally {
+            sendEmailBtn.disabled = false;
+            if(window.lucide) lucide.createIcons();
+        }
+    } // <--- 이 닫는 중괄호가 명확히 있어야 합니다!
+
+            // [Function] 인증번호 확인
+            function verifyCode() {
+                const userInputCode = document.getElementById('verificationCode').value;
+
+                if (!userInputCode) {
+                    alert('인증번호를 입력해주세요.');
+                    return;
+                }
+
+                // 서버에서 받아둔 번호와 사용자가 입력한 번호 비교
+                if (userInputCode === serverAuthCode.trim()) {
+                    isEmailVerified = true;
+                    verifyMsg.textContent = '이메일 인증이 완료되었습니다.';
+                    verifyMsg.className = 'text-[11px] ml-1 text-blue-600 font-bold';
+
+                    document.getElementById('verificationCode').disabled = true;
+                    document.getElementById('userEmail').readOnly = true;
+                    alert('인증에 성공하였습니다.');
+                } else {
+                    isEmailVerified = false;
+                    verifyMsg.textContent = '인증번호가 일치하지 않습니다.';
+                    verifyMsg.className = 'text-[11px] ml-1 text-rose-500 font-bold';
+                    alert('인증번호를 다시 확인해주세요.');
+                }
+            }
+
+            // [Async] 전체 폼 제출 (회원가입 처리)
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // 1. 아이디/비밀번호 정규식 정의 (영문 소문자 + 숫자 필수)
+                const idRegex = /^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{8,12}$/;
+                const pwRegex = /^(?=.*[a-z])(?=.*[0-9]).{8,11}$/;
+
+                // 2. 최종 유효성 검사 (서버 전송 전 마지막 바리케이드)
+                if (!idRegex.test(idInput.value)) {
+                    alert('아이디는 8~12자의 영문 소문자와 숫자를 혼합해야 합니다.');
+                    idInput.focus();
+                    return;
+                }
+                if (!isIdValid) {
+                    alert('아이디 중복 확인을 완료해주세요.');
+                    return;
+                }
+
+                if (!pwRegex.test(pwInput.value)) {
+                    alert('비밀번호는 영문 소문자와 숫자를 포함하여 8~11자로 입력해주세요.');
+                    pwInput.focus();
+                    return;
+                }
+                // 최종 유효성 검사
+                if (!isIdValid) {
+                    alert('아이디 중복 확인을 완료해주세요.');
+                    return;
+                }
+                if (!isEmailVerified) {
+                    alert('이메일 인증을 완료해주세요.');
+                    return;
+                }
+                if (pwInput.value !== pwConfirm.value) {
+                    alert('비밀번호가 일치하지 않습니다.');
+                    return;
+                }
+                if (pwInput.value.length < 8) {
+                    alert('비밀번호가 너무 짧습니다.');
+                    return;
+                }
+                if (!document.getElementById('agreeCheck').checked) {
+                    alert('약관 동의가 필요합니다.');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i data-lucide="loader-2" class="animate-spin w-5 h-5"></i> 처리 중...';
+                lucide.createIcons();
+
+                // 서버 DTO 구조와 필드명 맞춤
+                const formData = {
+                    userId: idInput.value,
+                    userName: document.getElementById('userName').value,
+                    userPw: pwInput.value,
+                    userEmail: document.getElementById('userEmail').value
+                };
+
+                try {
+                    const response = await fetch('/api/member/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json' // 오타 수정 완료
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        const msg = await response.text();
+                        alert('🎉 ' + msg);
+                        window.location.href = '/login';
+                    } else {
+                        const errorMsg = await response.text();
+                        alert('가입 실패: ' + errorMsg);
+                        resetBtn();
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('가입 처리 중 오류가 발생했습니다.');
+                    resetBtn();
+                }
+            });
+
+            // 버튼 복구용 공통 함수
+            function resetBtn() {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '가입하기 <i data-lucide="check" class="w-5 h-5"></i>';
+                lucide.createIcons();
+            }
+
+</script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
