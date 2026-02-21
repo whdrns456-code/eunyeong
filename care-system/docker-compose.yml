@@ -1,12 +1,24 @@
-# 수정된 docker-compose.yml (이걸 프로젝트 폴더로 옮기세요)
 version: '3.8'
 services:
+  # 1. 문지기 Nginx 추가
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf # 설정 파일 연결
+    depends_on:
+      - app
+    networks:
+      - backend-net
+
+  # 2. 기존 오라클 DB
   oracle-db:
     image: gvenzl/oracle-xe:latest
     container_name: my-secure-oracle
-    # AWS 배포 시 외부에서 DB에 직접 접속할 일이 없다면 ports는 삭제하는 게 보안상 좋습니다.
     environment:
-      - ORACLE_PASSWORD=${ORACLE_ROOT_PASSWORD} # 변수 처리
+      - ORACLE_PASSWORD=${ORACLE_ROOT_PASSWORD}
       - APP_USER=${DB_USERNAME}
       - APP_USER_PASSWORD=${DB_USERPASSWORD}
     volumes:
@@ -14,11 +26,13 @@ services:
     networks:
       - backend-net
 
+  # 3. 기존 스프링 App (수정됨)
   app:
     build: .
-    container_name: spring-app
-    ports:
-      - "8080:8080"
+    # container_name: spring-app
+    # ports: - "80:8080" 부분을 삭제합니다. (Nginx가 80을 쓰기 때문)
+    expose:
+      - "8080" # 외부엔 안 보이고 Nginx만 접근 가능
     depends_on:
       - oracle-db
     environment:

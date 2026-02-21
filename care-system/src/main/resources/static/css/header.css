@@ -134,4 +134,86 @@ body {
         text-align: center;
         padding: 10px 0;
     }
+
+    /* 모바일 메뉴 버튼 (기본 숨김) */
+.mobile-menu-btn {
+    display: none;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-dark);
+    order: 2; /* 로고 다음에 배치 */
+}
+
+    @media (max-width: 900px) {
+        header {
+            height: 70px; /* 고정 높이 유지 (중요: 아래로 늘어나는 것 방지) */
+            flex-direction: row; /* 로고와 버튼을 가로로 배치 */
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 0 5%;
+        }
+
+        .mobile-menu-btn {
+            display: block; /* 모바일에서 버튼 표시 */
+        }
+
+        /* 네비게이션과 인증 버튼 영역을 감싸는 스타일 */
+        .header-center, .header-right {
+            display: none; /* 기본적으로 숨김 */
+            width: 100%;
+            background-color: var(--header-bg);
+            flex: none;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            position: absolute;
+            left: 0;
+            box-shadow: 0 10px 10px rgba(0,0,0,0.05);
+        }
+
+        /* 토글 시 보여줄 클래스 */
+        .header-center.active, .header-right.active {
+            display: flex;
+        }
+
+        /* 메뉴 세로 정렬 */
+        .header-center {
+            top: 70px; /* 헤더 높이 직후 */
+            z-index: 1001;
+        }
+
+        .header-right {
+            top: auto; /* 메뉴 아래로 이어지게 설정 */
+            position: relative; /* flow 안으로 포함 */
+            display: none; /* 기본 숨김 */
+            justify-content: center;
+            border-top: none;
+            padding-bottom: 20px;
+        }
+
+        .header-right.active {
+            display: flex;
+            background-color: var(--header-bg);
+            position: absolute;
+            top: 360px; /* 메뉴 항목 개수에 따라 조정 필요 */
+        }
+
+        .nav-main {
+            flex-direction: column;
+            gap: 0;
+            padding: 10px 0;
+        }
+
+        .nav-main li {
+            width: 100%;
+            text-align: center;
+        }
+
+        .nav-main li a {
+            padding: 15px 0;
+            width: 100%;
+            border-bottom: 1px solid #f9f9f9;
+        }
+    }
 }

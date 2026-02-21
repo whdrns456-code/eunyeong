@@ -5,7 +5,11 @@
         <div class="logo" id="main-logo" onclick="location.href='/'">은영노인요양시설</div>
     </div>
 
-    <nav class="header-center">
+    <button class="mobile-menu-btn" id="mobile-toggle">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <nav class="header-center" id="nav-menu">
         <ul class="nav-main nav-links">
             <li><a th:href="@{/about}">요양원 소개</a></li>
             <li><a th:href="@{/schedule}">일정 안내</a></li>
@@ -15,27 +19,47 @@
             <li><a th:href="@{/visit}">면회신청</a></li>
         </ul>
     </nav>
-    <ul class="header-right nav-links">
+
+    <ul class="header-right nav-links" id="auth-menu">
         <th:block th:if="${#authorization.expression('isAnonymous()')}">
             <li><a th:href="@{/login}" class="auth-link">로그인</a></li>
             <li><a th:href="@{/signup}" class="auth-link">회원가입</a></li>
         </th:block>
 
         <th:block th:if="${#authorization.expression('isAuthenticated()')}">
-            <li class="session-timer" style="color: #e74c3c; font-weight: bold; font-size: 0.85rem;">
+            <li class="session-timer">
                 <i class="fa-regular fa-clock"></i> <span id="timer-display">30:00</span>
             </li>
             <li><a th:href="@{/mypage}" class="auth-link">마이페이지</a></li>
-            <li>
-                <a href="javascript:void(0);" onclick="logout()" class="auth-link">로그아웃</a>
-            </li>
+            <li><a href="javascript:void(0);" onclick="logout()" class="auth-link">로그아웃</a></li>
             <li class="user-welcome">
                 <span th:text="${#authentication.name} + '님 환영합니다!'">님</span>
             </li>
         </th:block>
     </ul>
-
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('mobile-toggle');
+            const navMenu = document.getElementById('nav-menu');
+            const authMenu = document.getElementById('auth-menu');
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    authMenu.classList.toggle('active');
+
+                    const icon = toggleBtn.querySelector('i');
+                    if (navMenu.classList.contains('active')) {
+                        icon.classList.replace('fa-bars', 'fa-xmark');
+                    } else {
+                        icon.classList.replace('fa-xmark', 'fa-bars');
+                    }
+                });
+            }
+        });
+
+
+
 
 
         async function logout() {
